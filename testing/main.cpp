@@ -1,23 +1,35 @@
 #include "../Math.h"
 #include <iostream>
-#include <cmath>
-
-namespace tml
-{
-    using Vector2f = tml::Vector<2, float>;
-    using Vector3f = tml::Vector<3, float>;
-    using Vector4f = tml::Vector<4, float>;
-}
 
 int main()
 {
-    tml::Vector4f vec(1.0f, 2.0f, 3.0f, 4.0f);
-    tml::Vector4f vec2(5.0f, 6.0f, 7.0f, 8.0f);
-    auto result = vec.Cross(vec2);
+    tml::Matrix4f scaleMat = tml::Matrix4f::Scale(tml::Vector4f(2.f,3.f,2.f,1.f));
 
     for(int i = 0; i < 4; i++)
     {
-        std::cout << result[i] << " ";
+        for(int j = 0; j < 4; j++)
+        {
+            std::cout << scaleMat[i][j] << " ";
+        }
+
+        std::cout << "\n";
     }
-    std::cout << std::endl;
+
+    std::cout << "\n";
+
+    tml::Matrix4f translateMat = tml::Matrix4f::Translate(tml::Vector4f(2.f,3.f,2.f,1.f));
+
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 4; j++)
+        {
+            std::cout << translateMat[i][j] << " ";
+        }
+
+        std::cout << "\n";
+    }
+
+    std::cout << "\n";
+
+    return 0;
 }

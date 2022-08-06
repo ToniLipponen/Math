@@ -1,36 +1,9 @@
 #pragma once
 #include <type_traits>
+#include <cmath>
 
 namespace tml
 {
-    namespace Impl
-    {
-        constexpr double sqrt(double x, double current, double previous) noexcept
-        {
-            return current == previous ? current : Impl::sqrt(x, 0.5 * (current + x / current), current);
-        }
-
-        constexpr double pow(double x, double current, unsigned long y) noexcept
-        {
-            return y > 0 ? Impl::pow(x, current * x, y - 1) : current;
-        }
-    }
-
-    constexpr double sqrt(double x) noexcept
-    {
-        if(x < 0)
-        {
-            x *= -1;
-        }
-
-        return Impl::sqrt(x, x, 0);
-    }
-
-    constexpr double pow(double x, unsigned long y) noexcept
-    {
-        return Impl::pow(x, 1, y);
-    }
-
     template<unsigned int N, typename T>
     class Vector
     {
@@ -50,6 +23,11 @@ namespace tml
         }
 
         constexpr T& operator[](unsigned int index) noexcept
+        {
+            return m_data[index];
+        }
+
+        constexpr T operator[](unsigned int index) const noexcept
         {
             return m_data[index];
         }
@@ -194,4 +172,76 @@ namespace tml
     protected:
         T m_data[N];
     };
+
+    using Vector2f = tml::Vector<2, float>;
+    using Vector3f = tml::Vector<3, float>;
+    using Vector4f = tml::Vector<4, float>;
+
+    using Vector2i = tml::Vector<2, int>;
+    using Vector3i = tml::Vector<3, int>;
+    using Vector4i = tml::Vector<4, int>;
+
+    using Vector2d = tml::Vector<2, double>;
+    using Vector3d = tml::Vector<3, double>;
+    using Vector4d = tml::Vector<4, double>;
+
+    template<unsigned int R, unsigned int C, typename T>
+    class Matrix
+    {
+    public:
+        constexpr Vector<C, T>& operator[](unsigned int index) noexcept
+        {
+            return m_rows[index];
+        }
+
+        constexpr static Matrix<R,C,T> Identity() noexcept
+        {
+            Matrix<R,C,T> result{};
+
+            for(unsigned int i = 0; i < C; ++i)
+            {
+                result.m_rows[i][i] = 1;
+            }
+
+            return result;
+        }
+
+        constexpr static Matrix<R,C,T> Scale(const Vector<C, T>& scale) noexcept
+        {
+            Matrix<R,C,T> result{};
+
+            for(unsigned int i = 0; i < C; ++i)
+            {
+                result[i][i] = scale[i];
+            }
+
+            return result;
+        }
+
+        static Matrix<R,C,T> Rotate(const Vector<C,T>& axis, double r) noexcept
+        {
+            const double sinr = sin(r);
+            const double cosr = cos(r);
+
+            return {};
+        }
+
+        constexpr static Matrix<R,C,T> Translate(const Vector<C,T>& offset) noexcept
+        {
+            Matrix<R,C,T> result = Matrix<R,C,T>::Identity();
+
+            for(unsigned int i = 0; i < C; ++i)
+            {
+                result[i][C-1] = offset[i];
+            }
+
+            return result;
+        }
+
+    private:
+        Vector<C, T> m_rows[R];
+    };
+
+    using Matrix4f = Matrix<4,4,float>;
+    using Matrix2f = Matrix<2,2,float>;
 }
