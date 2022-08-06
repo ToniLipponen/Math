@@ -1,9 +1,36 @@
 #pragma once
 #include <type_traits>
-#include "Core.h"
 
 namespace tml
 {
+    namespace Impl
+    {
+        constexpr double sqrt(double x, double current, double previous) noexcept
+        {
+            return current == previous ? current : Impl::sqrt(x, 0.5 * (current + x / current), current);
+        }
+
+        constexpr double pow(double x, double current, unsigned long y) noexcept
+        {
+            return y > 0 ? Impl::pow(x, current * x, y - 1) : current;
+        }
+    }
+
+    constexpr double sqrt(double x) noexcept
+    {
+        if(x < 0)
+        {
+            x *= -1;
+        }
+
+        return Impl::sqrt(x, x, 0);
+    }
+
+    constexpr double pow(double x, unsigned long y) noexcept
+    {
+        return Impl::pow(x, 1, y);
+    }
+
     template<unsigned int N, typename T>
     class Vector
     {
