@@ -3,33 +3,26 @@
 
 int main()
 {
-    tml::Matrix4f scaleMat = tml::Matrix4f::Scale(tml::Vector4f(2.f,3.f,2.f,1.f));
+    auto m1 = tml::Matrix<3,2,float>(
+            tml::Vector2(1.f, 2.f),
+            tml::Vector2(3.f, 4.f),
+            tml::Vector2(5.f, 1.f));
 
-    for(int i = 0; i < 4; i++)
+    auto m2 = tml::Matrix<2,1,float>(
+            tml::Vector<1,float>(2.f),
+            tml::Vector<1,float>(4.f));
+
+    auto m3 = m1 * m2;
+
+    for(int i = 0; i < m3.rows; i++)
     {
-        for(int j = 0; j < 4; j++)
+        for(int j = 0; j < m3.columns; j++)
         {
-            std::cout << scaleMat[i][j] << " ";
+            std::cout << m3[i][j] << "  ";
         }
 
         std::cout << "\n";
     }
-
-    std::cout << "\n";
-
-    tml::Matrix4f translateMat = tml::Matrix4f::Translate(tml::Vector4f(2.f,3.f,2.f,1.f));
-
-    for(int i = 0; i < 4; i++)
-    {
-        for(int j = 0; j < 4; j++)
-        {
-            std::cout << translateMat[i][j] << " ";
-        }
-
-        std::cout << "\n";
-    }
-
-    std::cout << "\n";
 
     return 0;
 }
