@@ -304,6 +304,9 @@ namespace tml
             static_assert(R == C, "This function is only defined for square matrices");
             static_assert(R > 1 && R < 5, "Invalid matrix dimensions");
 
+#if defined(TML_USE_DEGREES)
+            r *= 0.01745329252;
+#endif
             const auto sinr = sin(r);
             const auto cosr = cos(r);
 
@@ -311,33 +314,33 @@ namespace tml
             {
                 case 2:
                 {
-                    return Matrix<2,2,float_type>(
-                            Vector<2,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(-sinr)),
-                            Vector<2,float_type>(static_cast<float_type>(sinr), static_cast<float_type>(cosr)));
+                    return Matrix<R,C,float_type>(
+                            Vector<C,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(-sinr)),
+                            Vector<C,float_type>(static_cast<float_type>(sinr), static_cast<float_type>(cosr)));
                 }
 
                 case 3:
                 {
                     if(axis[0] > 0)
                     {
-                        return Matrix<3,3,float_type>(
-                                Vector<3,float_type>(static_cast<float_type>(1), static_cast<float_type>(0), static_cast<float_type>(0)),
-                                Vector<3,float_type>(static_cast<float_type>(0), static_cast<float_type>(cosr), static_cast<float_type>(-sinr)),
-                                Vector<3,float_type>(static_cast<float_type>(0), static_cast<float_type>(sinr), static_cast<float_type>(cosr)));
+                        return Matrix<R,C,float_type>(
+                                Vector<C,float_type>(static_cast<float_type>(1), static_cast<float_type>(0), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(cosr), static_cast<float_type>(-sinr)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(sinr), static_cast<float_type>(cosr)));
                     }
                     else if(axis[1] > 0)
                     {
-                        return Matrix<3,3,float_type>(
-                                Vector<3,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(0), static_cast<float_type>(sinr)),
-                                Vector<3,float_type>(static_cast<float_type>(0), static_cast<float_type>(1), static_cast<float_type>(0)),
-                                Vector<3,float_type>(static_cast<float_type>(-sinr), static_cast<float_type>(0), static_cast<float_type>(cosr)));
+                        return Matrix<R,C,float_type>(
+                                Vector<C,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(0), static_cast<float_type>(sinr)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(1), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(-sinr), static_cast<float_type>(0), static_cast<float_type>(cosr)));
                     }
                     else
                     {
-                        return Matrix<3,3,float_type>(
-                                Vector<3,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(-sinr), static_cast<float_type>(0)),
-                                Vector<3,float_type>(static_cast<float_type>(sinr), static_cast<float_type>(cosr), static_cast<float_type>(0)),
-                                Vector<3,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1)));
+                        return Matrix<R,C,float_type>(
+                                Vector<C,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(-sinr), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(sinr), static_cast<float_type>(cosr), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1)));
                     }
                 }
 
@@ -345,36 +348,33 @@ namespace tml
                 {
                     if(axis[0] > 0)
                     {
-                        return Matrix<4,4,float_type>(
-                                Vector<4,float_type>(static_cast<float_type>(1), static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(0)),
-                                Vector<4,float_type>(static_cast<float_type>(0), static_cast<float_type>(cosr), static_cast<float_type>(-sinr), static_cast<float_type>(0)),
-                                Vector<4,float_type>(static_cast<float_type>(0), static_cast<float_type>(sinr), static_cast<float_type>(cosr), static_cast<float_type>(0)),
-                                Vector<4,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1))
-                                        );
+                        return Matrix<R,C,float_type>(
+                                Vector<C,float_type>(static_cast<float_type>(1), static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(cosr), static_cast<float_type>(-sinr), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(sinr), static_cast<float_type>(cosr), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1))
+                        );
                     }
                     else if(axis[1] > 0)
                     {
-                        return Matrix<4,4,float_type>(
-                                Vector<4,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(0), static_cast<float_type>(sinr), static_cast<float_type>(0)),
-                                Vector<4,float_type>(static_cast<float_type>(0), static_cast<float_type>(1), static_cast<float_type>(0), static_cast<float_type>(0)),
-                                Vector<4,float_type>(static_cast<float_type>(-sinr), static_cast<float_type>(0), static_cast<float_type>(cosr), static_cast<float_type>(0)),
-                                Vector<4,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1)));
+                        return Matrix<R,C,float_type>(
+                                Vector<C,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(0), static_cast<float_type>(sinr), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(1), static_cast<float_type>(0), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(-sinr), static_cast<float_type>(0), static_cast<float_type>(cosr), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1)));
                     }
                     else
                     {
-                        return Matrix<4,4,float_type>(
-                                Vector<4,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(-sinr), static_cast<float_type>(0), static_cast<float_type>(0)),
-                                Vector<4,float_type>(static_cast<float_type>(sinr), static_cast<float_type>(cosr), static_cast<float_type>(0), static_cast<float_type>(0)),
-                                Vector<4,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1), static_cast<float_type>(0)),
-                                Vector<4,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1)));
+                        return Matrix<R,C,float_type>(
+                                Vector<C,float_type>(static_cast<float_type>(cosr), static_cast<float_type>(-sinr), static_cast<float_type>(0), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(sinr), static_cast<float_type>(cosr), static_cast<float_type>(0), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1), static_cast<float_type>(0)),
+                                Vector<C,float_type>(static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(0), static_cast<float_type>(1)));
                     }
                 }
-
                 default:
                     break;
             }
-
-            return {};
         }
 
         constexpr static Matrix<R,C,T> Translate(const Vector<C,T>& offset) noexcept
