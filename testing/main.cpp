@@ -3,6 +3,18 @@
 
 int main()
 {
+    // Vector - matrix multiplication
+    auto matrix = tml::Matrix4::Scale(tml::Vector4(10.f,10.f,10.f,10.f));
+    auto result = matrix * tml::Vector4(1.f, 2.f, 3.f, 4.f);
+
+    for(int i = 0; i < result.elements; i++)
+        std::cout << result[i] << " ";
+
+    std::cout << "\n\n";
+
+
+    // Matrix - matrix multiplication
+
     auto m1 = tml::Matrix<3,2,float>(
             tml::Vector2(1.f, 2.f),
             tml::Vector2(3.f, 4.f),

@@ -199,6 +199,7 @@ namespace tml
             return result;
         }
 
+        constexpr static unsigned int elements = N;
     protected:
         T m_data[N];
     };
@@ -229,8 +230,6 @@ namespace tml
         template<unsigned int R2, unsigned C2>
         constexpr Matrix<R,C2,T> operator*(const Matrix<R2,C2,T>& other) const noexcept
         {
-            static_assert(C == R2, "Invalid operands");
-
             Matrix<R,C2,T> result{};
 
             for(unsigned int i = 0; i < R; ++i)
@@ -248,6 +247,27 @@ namespace tml
 
                     result[i][j] = row.Dot(col);
                 }
+            }
+
+            return result;
+        }
+
+        constexpr Vector<R,T> operator*(const Vector<R,T>& vector) const noexcept
+        {
+            Matrix<R, 1, T> matrix;
+
+            for(unsigned int i = 0; i < R; ++i)
+            {
+                matrix[i][0] = vector[i];
+            }
+
+            matrix = *this * matrix;
+
+            Vector<R,T> result{};
+
+            for(unsigned int i = 0; i < R; ++i)
+            {
+                result[i] = matrix[i][0];
             }
 
             return result;
@@ -377,8 +397,8 @@ namespace tml
             return result;
         }
 
-        const unsigned int rows = R;
-        const unsigned int columns = C;
+        constexpr static unsigned int rows = R;
+        constexpr static unsigned int columns = C;
 
     protected:
         Vector<C, T> m_rows[R];
