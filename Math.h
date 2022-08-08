@@ -26,6 +26,28 @@
 #include <type_traits>
 #include <cmath>
 
+#define TML_DEFINE_VECTOR_OPERATOR_SCALAR(op)                       \
+constexpr Vector<N, T> operator op (const T& scalar) const noexcept \
+{                                                                   \
+    Vector<N, T> result;                                            \
+    for(unsigned int i = 0; i < N; ++i)                             \
+    {                                                               \
+        result.m_data[i] = m_data[i] op scalar;                     \
+    }                                                               \
+    return result;                                                  \
+}
+
+#define TML_DEFINE_VECTOR_OPERATOR_VECTOR(op)                                   \
+constexpr Vector<N, T> operator op (const Vector<N, T>& vector) const noexcept  \
+{                                                                               \
+    Vector<N, T> result;                                                        \
+    for(unsigned int i = 0; i < N; ++i)                                         \
+    {                                                                           \
+        result.m_data[i] = m_data[i] op vector.m_data[i];                       \
+    }                                                                           \
+    return result;                                                              \
+}
+
 namespace tml
 {
 #if defined(TML_USE_DOUBLE_PRECISION)
@@ -62,101 +84,15 @@ namespace tml
             return m_data[index];
         }
 
-        constexpr Vector<N, T> operator+(const Vector<N, T>& other) const noexcept
-        {
-            Vector<N, T> result;
+        TML_DEFINE_VECTOR_OPERATOR_SCALAR(+);
+        TML_DEFINE_VECTOR_OPERATOR_SCALAR(-);
+        TML_DEFINE_VECTOR_OPERATOR_SCALAR(*);
+        TML_DEFINE_VECTOR_OPERATOR_SCALAR(/);
 
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                result.m_data[i] = m_data[i] + other.m_data[i];
-            }
-
-            return result;
-        }
-
-        constexpr Vector<N, T> operator+(const T& scalar) const noexcept
-        {
-            Vector<N, T> result;
-
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                result.m_data[i] = m_data[i] + scalar;
-            }
-
-            return result;
-        }
-
-        constexpr Vector<N, T> operator-(const Vector<N, T>& other) const noexcept
-        {
-            Vector<N, T> result;
-
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                result.m_data[i] = m_data[i] - other.m_data[i];
-            }
-
-            return result;
-        }
-
-        constexpr Vector<N, T> operator-(const T& scalar) const noexcept
-        {
-            Vector<N, T> result;
-
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                result.m_data[i] = m_data[i] - scalar;
-            }
-
-            return result;
-        }
-
-        constexpr Vector<N, T> operator*(const Vector<N, T>& other) const noexcept
-        {
-            Vector<N, T> result;
-
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                result.m_data[i] = m_data[i] * other.m_data[i];
-            }
-
-            return result;
-        }
-
-        constexpr Vector<N, T> operator*(const T& scalar) const noexcept
-        {
-            Vector<N, T> result;
-
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                result.m_data[i] = m_data[i] * scalar;
-            }
-
-            return result;
-        }
-
-        constexpr Vector<N, T> operator/(const Vector<N, T>& other) const noexcept
-        {
-            Vector<N, T> result;
-
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                result.m_data[i] = m_data[i] / other.m_data[i];
-            }
-
-            return result;
-        }
-
-        constexpr Vector<N, T> operator/(const T& scalar) const noexcept
-        {
-            Vector<N, T> result;
-
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                result.m_data[i] = m_data[i] / scalar;
-            }
-
-            return result;
-        }
+        TML_DEFINE_VECTOR_OPERATOR_VECTOR(+);
+        TML_DEFINE_VECTOR_OPERATOR_VECTOR(-);
+        TML_DEFINE_VECTOR_OPERATOR_VECTOR(*);
+        TML_DEFINE_VECTOR_OPERATOR_VECTOR(/);
 
         constexpr double Length() const noexcept
         {
