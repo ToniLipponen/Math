@@ -2,11 +2,32 @@
 #include "../Math.h"
 #include <iostream>
 
+template<unsigned int R, unsigned int C, typename T>
+void PrintMatrix(const tml::Matrix<R,C,T>& m)
+{
+    for(int i = 0; i < m.rows; i++)
+    {
+        for(int j = 0; j < m.columns; j++)
+        {
+            std::cout << m[i][j] << "  ";
+        }
+
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+}
+
 int main()
 {
     // Vector - matrix multiplication
     auto matrix = tml::Matrix4::Rotate(tml::Vector4(0.f,0.f,1.f,0.f), 90);
     auto result = matrix * tml::Vector4(10.f, 0.f, 0.f, 0.f);
+
+    auto inv = matrix.Inverse();
+    inv = matrix * inv;
+
+    PrintMatrix(matrix);
+    PrintMatrix(inv);
 
     for(int i = 0; i < result.elements; i++)
         std::cout << static_cast<int>(result[i]) << " ";

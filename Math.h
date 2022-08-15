@@ -188,6 +188,21 @@ namespace tml
             return result;
         }
 
+        constexpr Matrix<R,C,T> operator*(T scalar) const noexcept
+        {
+            Matrix<R,C,T> result{};
+
+            for(unsigned int i = 0; i < R; ++i)
+            {
+                for(unsigned int j = 0; j < C; ++j)
+                {
+                    result[i][j] = m_rows[i][j] * scalar;
+                }
+            }
+
+            return result;
+        }
+
         constexpr Vector<R,T> operator*(const Vector<R,T>& vector) const noexcept
         {
             Matrix<R, 1, T> matrix;
@@ -328,10 +343,117 @@ namespace tml
 
         constexpr Matrix<R,C,T> Inverse() const noexcept
         {
-            Matrix<R,C,T> result{};
+            static_assert(R == C, "This function is only defined for square matrices");
+            static_assert(R <= 4 && R >= 2, "Invalid matrix dimensions");
 
-            return result;
+            return Inverse::Get(*this);
         }
+
+        struct Inverse
+        {
+            constexpr static Matrix<2,2,T> Get(const Matrix<2,2,T>& m) noexcept
+            {
+                T oneOverDeterminant = static_cast<T>(1) / (
+                         m[0][0] * m[1][1]
+                        -m[1][0] * m[0][1]);
+
+                return Matrix<2, 2, T>(
+                         m[1][1] * oneOverDeterminant,
+                        -m[0][1] * oneOverDeterminant,
+                        -m[1][0] * oneOverDeterminant,
+                         m[0][0] * oneOverDeterminant);
+            }
+
+            constexpr static Matrix<3,3,T> Get(const Matrix<3,3,T>& m) noexcept
+            {
+                T oneOverDeterminant = static_cast<T>(1) / (
+                          m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2])
+                        - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2])
+                        + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]));
+
+                Matrix<3, 3, T> inverse;
+                inverse[0][0] =  (m[1][1] * m[2][2] - m[2][1] * m[1][2]) * oneOverDeterminant;
+                inverse[1][0] = -(m[1][0] * m[2][2] - m[2][0] * m[1][2]) * oneOverDeterminant;
+                inverse[2][0] =  (m[1][0] * m[2][1] - m[2][0] * m[1][1]) * oneOverDeterminant;
+                inverse[0][1] = -(m[0][1] * m[2][2] - m[2][1] * m[0][2]) * oneOverDeterminant;
+                inverse[1][1] =  (m[0][0] * m[2][2] - m[2][0] * m[0][2]) * oneOverDeterminant;
+                inverse[2][1] = -(m[0][0] * m[2][1] - m[2][0] * m[0][1]) * oneOverDeterminant;
+                inverse[0][2] =  (m[0][1] * m[1][2] - m[1][1] * m[0][2]) * oneOverDeterminant;
+                inverse[1][2] = -(m[0][0] * m[1][2] - m[1][0] * m[0][2]) * oneOverDeterminant;
+                inverse[2][2] =  (m[0][0] * m[1][1] - m[1][0] * m[0][1]) * oneOverDeterminant;
+
+                return inverse;
+            }
+
+            inline constexpr static Matrix<4,4,T> Get(const Matrix<4,4,T>& m) noexcept
+            {
+                T coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+                T coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
+                T coef03 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
+
+                T coef04 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+                T coef06 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
+                T coef07 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
+
+                T coef08 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+                T coef10 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
+                T coef11 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
+
+                T coef12 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+                T coef14 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
+                T coef15 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
+
+                T coef16 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+                T coef18 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
+                T coef19 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
+
+                T coef20 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+                T coef22 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
+                T coef23 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
+
+                Vector<4, T> fac0(coef00, coef00, coef02, coef03);
+                Vector<4, T> fac1(coef04, coef04, coef06, coef07);
+                Vector<4, T> fac2(coef08, coef08, coef10, coef11);
+                Vector<4, T> fac3(coef12, coef12, coef14, coef15);
+                Vector<4, T> fac4(coef16, coef16, coef18, coef19);
+                Vector<4, T> fac5(coef20, coef20, coef22, coef23);
+
+                Vector<4, T> vec0(m[1][0], m[0][0], m[0][0], m[0][0]);
+                Vector<4, T> vec1(m[1][1], m[0][1], m[0][1], m[0][1]);
+                Vector<4, T> vec2(m[1][2], m[0][2], m[0][2], m[0][2]);
+                Vector<4, T> vec3(m[1][3], m[0][3], m[0][3], m[0][3]);
+
+                Vector<4, T> inv0(vec1 * fac0 - vec2 * fac1 + vec3 * fac2);
+                Vector<4, T> inv1(vec0 * fac0 - vec2 * fac3 + vec3 * fac4);
+                Vector<4, T> inv2(vec0 * fac1 - vec1 * fac3 + vec3 * fac5);
+                Vector<4, T> inv3(vec0 * fac2 - vec1 * fac4 + vec2 * fac5);
+
+                Vector<4, T> SignA(
+                        static_cast<T>( 1),
+                        static_cast<T>(-1),
+                        static_cast<T>( 1),
+                        static_cast<T>(-1)
+                );
+
+                Vector<4, T> SignB(
+                        static_cast<T>(-1),
+                        static_cast<T>( 1),
+                        static_cast<T>(-1),
+                        static_cast<T>( 1)
+                );
+
+                Matrix<4, 4, T> Inverse(inv0 * SignA, inv1 * SignB, inv2 * SignA, inv3 * SignB);
+
+                Vector<4, T> Row0(Inverse[0][0], Inverse[1][0], Inverse[2][0], Inverse[3][0]);
+
+                Vector<4, T> Dot0(m[0] * Row0);
+                T Dot1 = (Dot0[0] + Dot0[1]) + (Dot0[2] + Dot0[3]);
+
+                T OneOverDeterminant = static_cast<T>(1) / Dot1;
+
+                return Inverse * OneOverDeterminant;
+            }
+        };
 
         constexpr static unsigned int rows = R;
         constexpr static unsigned int columns = C;
@@ -347,4 +469,5 @@ namespace tml
     using Matrix4 = Matrix<4, 4, float_type>;
     using Matrix3 = Matrix<3, 3, float_type>;
     using Matrix2 = Matrix<2, 2, float_type>;
+
 }
