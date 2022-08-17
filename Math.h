@@ -59,6 +59,26 @@ constexpr Vector<N, T> operator op (const Vector<N, T>& vector) const noexcept  
     return result;                                                              \
 }
 
+#define TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(op)                            \
+constexpr Vector<N, T>& operator op (const Vector<N, T>& vector) noexcept       \
+{                                                                               \
+    for(unsigned int i = 0; i < N; ++i)                                         \
+    {                                                                           \
+        m_data[i] = m_data[i] op vector.m_data[i];                              \
+    }                                                                           \
+    return *this;                                                               \
+}
+
+#define TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(op)                            \
+constexpr Vector<N, T>& operator op (T scalar) noexcept                         \
+{                                                                               \
+    for(unsigned int i = 0; i < N; ++i)                                         \
+    {                                                                           \
+        m_data[i] = m_data[i] op scalar;                                        \
+    }                                                                           \
+    return *this;                                                               \
+}
+
 namespace tml
 {
 #if defined(TML_USE_DOUBLE_PRECISION)
@@ -73,8 +93,8 @@ namespace tml
     using int_type = long long;
 #endif
 
-    [[maybe_unused]] const constexpr float_type float_max = std::numeric_limits<float_type>::max();
-    [[maybe_unused]] const constexpr int_type int_max = std::numeric_limits<int_type>::max();
+    TML_MAYBE_UNUSED const constexpr float_type float_max = std::numeric_limits<float_type>::max();
+    TML_MAYBE_UNUSED const constexpr int_type int_max = std::numeric_limits<int_type>::max();
 
     template<unsigned int N, typename T>
     class Vector
@@ -84,6 +104,27 @@ namespace tml
         {
             static_assert(std::is_arithmetic<T>::value, "T has to be an arithmetic type");
             static_assert(N > 0, "N has to be greater than 0");
+        }
+
+        explicit constexpr Vector(T scalar) noexcept
+        {
+            for(unsigned int i = 0; i < N; ++i)
+            {
+                m_data[i] = scalar;
+            }
+        }
+
+        constexpr Vector(const Vector<N, T>& vector) noexcept
+        {
+            for(unsigned int i = 0; i < N; ++i)
+            {
+                m_data[i] = vector.m_data[i];
+            }
+        }
+
+        constexpr Vector(Vector<N, T>&& vector) noexcept
+        {
+            std::swap(m_data, vector.m_data);
         }
 
         template<typename ... A>
@@ -104,6 +145,42 @@ namespace tml
             return m_data[index];
         }
 
+        constexpr Vector<N,T>& operator=(const Vector<N,T>& other) noexcept
+        {
+            if(&other != this)
+            {
+                for(unsigned int i = 0; i < N; ++i)
+                {
+                    m_data[i] = other.m_data[i];
+                }
+            }
+
+            return *this;
+        }
+
+        constexpr Vector<N,T>& operator=(Vector<N,T>&& other) noexcept
+        {
+            if(&other != this)
+            {
+                std::swap(m_data, other.m_data);
+            }
+
+            return *this;
+        }
+
+        constexpr bool operator==(const Vector<N,T>& other) noexcept
+        {
+            for(unsigned int i = 0; i < N; ++i)
+            {
+                if(m_data[i] != other.m_data[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         TML_DEFINE_VECTOR_OPERATOR_SCALAR(+);
         TML_DEFINE_VECTOR_OPERATOR_SCALAR(-);
         TML_DEFINE_VECTOR_OPERATOR_SCALAR(*);
@@ -114,21 +191,36 @@ namespace tml
         TML_DEFINE_VECTOR_OPERATOR_VECTOR(*);
         TML_DEFINE_VECTOR_OPERATOR_VECTOR(/);
 
-        constexpr double Length() const noexcept
+        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(+);
+        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(-);
+        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(*);
+        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(/);
+
+        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(+);
+        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(-);
+        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(*);
+        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(/);
+
+        constexpr float_type Length() const noexcept
         {
-            double length = 0;
+            float_type length = 0;
 
             for(unsigned int i = 0; i < N; ++i)
             {
                 length += pow(m_data[i], 2);
             }
 
-            return sqrt(length);
+            return static_cast<float_type>(sqrt(length));
         }
 
         TML_MAYBE_UNUSED constexpr Vector<N, T> Normalized() const noexcept
         {
             return *this / Length();
+        }
+
+        TML_MAYBE_UNUSED constexpr Vector<N, T>& Normalize() noexcept
+        {
+            return *this /= Length();
         }
 
         constexpr double Dot(const Vector<N, T>& other) const noexcept

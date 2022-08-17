@@ -34,9 +34,9 @@ int main()
 
     // Matrix - matrix multiplication
     auto m1 = tml::Matrix<3,2,float>(
-            tml::Vector2<float>(1.f, 2.f),
-            tml::Vector2<float>(3.f, 4.f),
-            tml::Vector2<float>(5.f, 1.f));
+            tml::Vector2f(1.f, 2.f),
+            tml::Vector2f(3.f, 4.f),
+            tml::Vector2f(5.f, 1.f));
 
     auto m2 = tml::Matrix<2,1,float>(
             tml::Vector<1,float>(2.f),
