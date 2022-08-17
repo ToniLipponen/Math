@@ -17,28 +17,33 @@ void PrintMatrix(const tml::Matrix<R,C,T>& m)
     std::cout << "\n";
 }
 
+template<unsigned int N, typename T>
+void PrintVector(const tml::Vector<N,T>& v)
+{
+    for(int i = 0; i < v.elements; i++)
+        std::cout << v[i] << " ";
+
+    std::cout << "\n\n";
+}
+
 int main()
 {
     // Vector - matrix multiplication
-    auto matrix = tml::Matrix4::Rotate(tml::Vector4(0.f,0.f,1.f,0.f), 90);
-    auto result = matrix * tml::Vector4(10.f, 0.f, 0.f, 0.f);
+    auto matrix = tml::Matrix4f::Rotate(tml::Vector4f(0.f,0.f,1.f,0.f), 90);
+    auto result = matrix * tml::Vector4f(10.f, 0.f, 0.f, 0.f);
 
     auto inv = matrix.Inverse();
     inv = matrix * inv;
 
     PrintMatrix(matrix);
     PrintMatrix(inv);
-
-    for(int i = 0; i < result.elements; i++)
-        std::cout << static_cast<int>(result[i]) << " ";
-
-    std::cout << "\n\n";
+    PrintVector(result);
 
     // Matrix - matrix multiplication
     auto m1 = tml::Matrix<3,2,float>(
-            tml::Vector2(1.f, 2.f),
-            tml::Vector2(3.f, 4.f),
-            tml::Vector2(5.f, 1.f));
+            tml::Vector2<float>(1.f, 2.f),
+            tml::Vector2<float>(3.f, 4.f),
+            tml::Vector2<float>(5.f, 1.f));
 
     auto m2 = tml::Matrix<2,1,float>(
             tml::Vector<1,float>(2.f),
@@ -46,15 +51,7 @@ int main()
 
     auto m3 = m1 * m2;
 
-    for(int i = 0; i < m3.rows; i++)
-    {
-        for(int j = 0; j < m3.columns; j++)
-        {
-            std::cout << m3[i][j] << "  ";
-        }
-
-        std::cout << "\n";
-    }
+    PrintMatrix(m3);
 
     return 0;
 }

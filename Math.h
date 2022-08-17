@@ -56,6 +56,12 @@ namespace tml
     using float_type = float;
 #endif
 
+#if defined(TML_USE_LONG_INTEGERS)
+    using int_type = int;
+#else
+    using int_type = long long;
+#endif
+
     template<unsigned int N, typename T>
     class Vector
     {
@@ -135,9 +141,47 @@ namespace tml
             return result;
         }
 
+    public:
         constexpr static unsigned int elements = N;
+
     protected:
+        T& X() noexcept { return m_data[0]; }
+        T& Y() noexcept { return m_data[1]; }
+        T& Z() noexcept { return m_data[2]; }
+        T& W() noexcept { return m_data[3]; }
+
+    private:
         T m_data[N];
+    };
+
+    template<typename T>
+    class Vector2 : public Vector<2, T>
+    {
+    public:
+        using Vector<2, T>::Vector;
+        using Vector<2, T>::X;
+        using Vector<2, T>::Y;
+    };
+
+    template<typename T>
+    class Vector3 : public Vector<3, T>
+    {
+    public:
+        using Vector<3, T>::Vector;
+        using Vector<3, T>::X;
+        using Vector<3, T>::Y;
+        using Vector<3, T>::Z;
+    };
+
+    template<typename T>
+    class Vector4 : public Vector<4, T>
+    {
+    public:
+        using Vector<4, T>::Vector;
+        using Vector<4, T>::X;
+        using Vector<4, T>::Y;
+        using Vector<4, T>::Z;
+        using Vector<4, T>::W;
     };
 
     template<unsigned int R, unsigned int C, typename T>
@@ -371,87 +415,87 @@ namespace tml
                         - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2])
                         + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]));
 
-                Matrix<3, 3, T> inverse;
-                inverse[0][0] =  (m[1][1] * m[2][2] - m[2][1] * m[1][2]) * oneOverDeterminant;
-                inverse[1][0] = -(m[1][0] * m[2][2] - m[2][0] * m[1][2]) * oneOverDeterminant;
-                inverse[2][0] =  (m[1][0] * m[2][1] - m[2][0] * m[1][1]) * oneOverDeterminant;
-                inverse[0][1] = -(m[0][1] * m[2][2] - m[2][1] * m[0][2]) * oneOverDeterminant;
-                inverse[1][1] =  (m[0][0] * m[2][2] - m[2][0] * m[0][2]) * oneOverDeterminant;
-                inverse[2][1] = -(m[0][0] * m[2][1] - m[2][0] * m[0][1]) * oneOverDeterminant;
-                inverse[0][2] =  (m[0][1] * m[1][2] - m[1][1] * m[0][2]) * oneOverDeterminant;
-                inverse[1][2] = -(m[0][0] * m[1][2] - m[1][0] * m[0][2]) * oneOverDeterminant;
-                inverse[2][2] =  (m[0][0] * m[1][1] - m[1][0] * m[0][1]) * oneOverDeterminant;
+                Matrix<3, 3, T> result;
+                result[0][0] =  (m[1][1] * m[2][2] - m[2][1] * m[1][2]) * oneOverDeterminant;
+                result[1][0] = -(m[1][0] * m[2][2] - m[2][0] * m[1][2]) * oneOverDeterminant;
+                result[2][0] =  (m[1][0] * m[2][1] - m[2][0] * m[1][1]) * oneOverDeterminant;
+                result[0][1] = -(m[0][1] * m[2][2] - m[2][1] * m[0][2]) * oneOverDeterminant;
+                result[1][1] =  (m[0][0] * m[2][2] - m[2][0] * m[0][2]) * oneOverDeterminant;
+                result[2][1] = -(m[0][0] * m[2][1] - m[2][0] * m[0][1]) * oneOverDeterminant;
+                result[0][2] =  (m[0][1] * m[1][2] - m[1][1] * m[0][2]) * oneOverDeterminant;
+                result[1][2] = -(m[0][0] * m[1][2] - m[1][0] * m[0][2]) * oneOverDeterminant;
+                result[2][2] =  (m[0][0] * m[1][1] - m[1][0] * m[0][1]) * oneOverDeterminant;
 
-                return inverse;
+                return result;
             }
 
             inline constexpr static Matrix<4,4,T> Get(const Matrix<4,4,T>& m) noexcept
             {
-                T coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
-                T coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
-                T coef03 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
+                const T coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+                const T coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
+                const T coef03 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
 
-                T coef04 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
-                T coef06 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
-                T coef07 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
+                const T coef04 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+                const T coef06 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
+                const T coef07 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
 
-                T coef08 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
-                T coef10 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
-                T coef11 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
+                const T coef08 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+                const T coef10 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
+                const T coef11 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
 
-                T coef12 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
-                T coef14 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
-                T coef15 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
+                const T coef12 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+                const T coef14 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
+                const T coef15 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
 
-                T coef16 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
-                T coef18 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
-                T coef19 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
+                const T coef16 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+                const T coef18 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
+                const T coef19 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
 
-                T coef20 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
-                T coef22 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
-                T coef23 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
+                const T coef20 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+                const T coef22 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
+                const T coef23 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
 
-                Vector<4, T> fac0(coef00, coef00, coef02, coef03);
-                Vector<4, T> fac1(coef04, coef04, coef06, coef07);
-                Vector<4, T> fac2(coef08, coef08, coef10, coef11);
-                Vector<4, T> fac3(coef12, coef12, coef14, coef15);
-                Vector<4, T> fac4(coef16, coef16, coef18, coef19);
-                Vector<4, T> fac5(coef20, coef20, coef22, coef23);
+                const Vector<4, T> fac0(coef00, coef00, coef02, coef03);
+                const Vector<4, T> fac1(coef04, coef04, coef06, coef07);
+                const Vector<4, T> fac2(coef08, coef08, coef10, coef11);
+                const Vector<4, T> fac3(coef12, coef12, coef14, coef15);
+                const Vector<4, T> fac4(coef16, coef16, coef18, coef19);
+                const Vector<4, T> fac5(coef20, coef20, coef22, coef23);
 
-                Vector<4, T> vec0(m[1][0], m[0][0], m[0][0], m[0][0]);
-                Vector<4, T> vec1(m[1][1], m[0][1], m[0][1], m[0][1]);
-                Vector<4, T> vec2(m[1][2], m[0][2], m[0][2], m[0][2]);
-                Vector<4, T> vec3(m[1][3], m[0][3], m[0][3], m[0][3]);
+                const Vector<4, T> vec0(m[1][0], m[0][0], m[0][0], m[0][0]);
+                const Vector<4, T> vec1(m[1][1], m[0][1], m[0][1], m[0][1]);
+                const Vector<4, T> vec2(m[1][2], m[0][2], m[0][2], m[0][2]);
+                const Vector<4, T> vec3(m[1][3], m[0][3], m[0][3], m[0][3]);
 
-                Vector<4, T> inv0(vec1 * fac0 - vec2 * fac1 + vec3 * fac2);
-                Vector<4, T> inv1(vec0 * fac0 - vec2 * fac3 + vec3 * fac4);
-                Vector<4, T> inv2(vec0 * fac1 - vec1 * fac3 + vec3 * fac5);
-                Vector<4, T> inv3(vec0 * fac2 - vec1 * fac4 + vec2 * fac5);
+                const Vector<4, T> inv0(vec1 * fac0 - vec2 * fac1 + vec3 * fac2);
+                const Vector<4, T> inv1(vec0 * fac0 - vec2 * fac3 + vec3 * fac4);
+                const Vector<4, T> inv2(vec0 * fac1 - vec1 * fac3 + vec3 * fac5);
+                const Vector<4, T> inv3(vec0 * fac2 - vec1 * fac4 + vec2 * fac5);
 
-                Vector<4, T> SignA(
+                const Vector<4, T> SignA(
                         static_cast<T>( 1),
                         static_cast<T>(-1),
                         static_cast<T>( 1),
                         static_cast<T>(-1)
                 );
 
-                Vector<4, T> SignB(
+                const Vector<4, T> SignB(
                         static_cast<T>(-1),
                         static_cast<T>( 1),
                         static_cast<T>(-1),
                         static_cast<T>( 1)
                 );
 
-                Matrix<4, 4, T> Inverse(inv0 * SignA, inv1 * SignB, inv2 * SignA, inv3 * SignB);
+                const Matrix<4, 4, T> inverse(inv0 * SignA, inv1 * SignB, inv2 * SignA, inv3 * SignB);
 
-                Vector<4, T> Row0(Inverse[0][0], Inverse[1][0], Inverse[2][0], Inverse[3][0]);
+                const Vector<4, T> row0(inverse[0][0], inverse[1][0], inverse[2][0], inverse[3][0]);
 
-                Vector<4, T> Dot0(m[0] * Row0);
-                T Dot1 = (Dot0[0] + Dot0[1]) + (Dot0[2] + Dot0[3]);
+                const Vector<4, T> dot0(m[0] * row0);
+                const T dot1 = (dot0[0] + dot0[1]) + (dot0[2] + dot0[3]);
 
-                T OneOverDeterminant = static_cast<T>(1) / Dot1;
+                const T oneOverDeterminant = static_cast<T>(1) / dot1;
 
-                return Inverse * OneOverDeterminant;
+                return inverse * oneOverDeterminant;
             }
         };
 
@@ -462,12 +506,19 @@ namespace tml
         Vector<C, T> m_rows[R];
     };
 
-    using Vector2 = tml::Vector<2, float_type>;
-    using Vector3 = tml::Vector<3, float_type>;
-    using Vector4 = tml::Vector<4, float_type>;
+    using Vector2f = Vector2<float_type>;
+    using Vector3f = Vector3<float_type>;
+    using Vector4f = Vector4<float_type>;
 
-    using Matrix4 = Matrix<4, 4, float_type>;
-    using Matrix3 = Matrix<3, 3, float_type>;
-    using Matrix2 = Matrix<2, 2, float_type>;
+    using Vector2i = Vector2<int_type>;
+    using Vector3i = Vector3<int_type>;
+    using Vector4i = Vector4<int_type>;
 
+    using Matrix4f = Matrix<4, 4, float_type>;
+    using Matrix3f = Matrix<3, 3, float_type>;
+    using Matrix2f = Matrix<2, 2, float_type>;
+
+    using Matrix4i = Matrix<4, 4, int_type>;
+    using Matrix3i = Matrix<3, 3, int_type>;
+    using Matrix2i = Matrix<2, 2, int_type>;
 }
