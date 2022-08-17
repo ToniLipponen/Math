@@ -1,1 +1,1 @@
-WIP single file header only math library, defining simple vector and matrix types.
+## Single file, header only linear algebra library.

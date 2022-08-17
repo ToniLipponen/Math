@@ -29,10 +29,10 @@ void PrintVector(const tml::Vector<N,T>& v)
 int main()
 {
     // Vector - matrix multiplication
-    auto matrix = tml::Matrix4f::Rotate(tml::Vector4f(0.f,0.f,1.f,0.f), 90);
+    auto matrix = tml::Matrix4x4f::Rotate(tml::Vector4f(0.f,0.f,1.f,0.f), 90);
     auto result = matrix * tml::Vector4f(10.f, 0.f, 0.f, 0.f);
 
-    auto inv = matrix.Inverse();
+    auto inv = tml::Matrix4x4f::Inverse(matrix);
     inv = matrix * inv;
 
     PrintMatrix(matrix);
