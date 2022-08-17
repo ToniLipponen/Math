@@ -32,13 +32,6 @@ int main()
     auto matrix = tml::Matrix4x4f::Rotate(tml::Vector4f(0.f,0.f,1.f,0.f), 90);
     auto result = matrix * tml::Vector4f(10.f, 0.f, 0.f, 0.f);
 
-    auto inv = tml::Matrix4x4f::Inverse(matrix);
-    inv = matrix * inv;
-
-    PrintMatrix(matrix);
-    PrintMatrix(inv);
-    PrintVector(result);
-
     // Matrix - matrix multiplication
     auto m1 = tml::Matrix<3,2,float>(
             tml::Vector2<float>(1.f, 2.f),
@@ -51,6 +44,8 @@ int main()
 
     auto m3 = m1 * m2;
 
+    PrintMatrix(matrix);
+    PrintVector(result);
     PrintMatrix(m3);
 
     return 0;

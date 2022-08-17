@@ -202,13 +202,18 @@ namespace tml
     class Matrix
     {
     public:
-        constexpr Matrix() noexcept = default;
+        constexpr Matrix() noexcept
+        {
+            static_assert(std::is_arithmetic<T>::value, "T has to be an arithmetic type");
+            static_assert(R > 0 && C > 0, "Both dimensions of a matrix have to be more than 0");
+        }
 
         template<typename ... A>
         constexpr explicit Matrix(const A& ... args) noexcept
         : m_rows{args ...}
         {
-
+            static_assert(std::is_arithmetic<T>::value, "T has to be an arithmetic type");
+            static_assert(R > 0 && C > 0, "Both dimensions of a matrix have to be more than 0");
         }
 
         constexpr Vector<C, T>& operator[](unsigned int index) noexcept
@@ -287,9 +292,12 @@ namespace tml
             static_assert(R == C, "This function is only defined for square matrices");
             Matrix<R,C,T> result{};
 
-            for(unsigned int i = 0; i < C; ++i)
+            for(unsigned int i = 0; i < R; ++i)
             {
-                result.m_rows[i][i] = 1;
+                for(unsigned int j = 0; j < C; ++j)
+                {
+                    result[i][j] = static_cast<T>(i == j);
+                }
             }
 
             return result;
@@ -379,7 +387,7 @@ namespace tml
             };
         }
 
-        inline static Matrix4x4<T> Rotate(const Vector4<T>& axis, float_type r) noexcept
+        TML_MAYBE_UNUSED inline static Matrix4x4<T> Rotate(const Vector4<T>& axis, float_type r) noexcept
         {
 #if defined(TML_USE_DEGREES)
             r *= 0.01745329252;
@@ -416,7 +424,7 @@ namespace tml
             }
         }
 
-        inline constexpr static Matrix4x4<T> Inverse(const Matrix4x4<T>& m) noexcept
+        TML_MAYBE_UNUSED inline constexpr static Matrix4x4<T> Inverse(const Matrix4x4<T>& m) noexcept
         {
             const T coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
             const T coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
