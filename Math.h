@@ -135,6 +135,8 @@ namespace tml
             static_assert(N > 0, "N has to be greater than 0");
         }
 
+        virtual ~Vector() noexcept = default;
+
         constexpr T& operator[](unsigned int index) noexcept
         {
             return m_data[index];
@@ -308,6 +310,40 @@ namespace tml
             static_assert(R > 0 && C > 0, "Both dimensions of a matrix have to be more than 0");
         }
 
+        Matrix(const Matrix<R,C,T>& other) noexcept
+        {
+            for(unsigned int i = 0; i < R; ++i)
+            {
+                m_rows[i] = other.m_rows[i];
+            }
+        }
+
+        Matrix(Matrix<R,C,T>&& other) noexcept
+        {
+            std::swap(m_rows, other.m_rows);
+        }
+
+        virtual ~Matrix() noexcept = default;
+
+        Matrix<R,C,T>& operator=(const Matrix<R,C,T>& other) noexcept
+        {
+            if(this != &other)
+            {
+                for(unsigned int i = 0; i < R; ++i)
+                {
+                    m_rows[i] = other.m_rows[i];
+                }
+            }
+
+            return *this;
+        }
+
+        Matrix<R,C,T>& operator=(Matrix<R,C,T>&& other) noexcept
+        {
+            std::swap(m_rows, other.m_rows);
+            return *this;
+        }
+
         constexpr Vector<C, T>& operator[](unsigned int index) noexcept
         {
             return m_rows[index];
@@ -451,12 +487,6 @@ namespace tml
 
         }
 
-        explicit Matrix4x4(Matrix<4,4,T>&& other) noexcept
-        : Matrix<4,4,T>(other)
-        {
-
-        }
-
         TML_MAYBE_UNUSED static Matrix4x4<float_type> Orthographic(
                 float_type left,
                 float_type right,
@@ -479,7 +509,7 @@ namespace tml
             };
         }
 
-        TML_MAYBE_UNUSED inline static Matrix4x4<T> Rotate(const Vector4<T>& axis, float_type r) noexcept
+        TML_MAYBE_UNUSED inline static Matrix4x4<T> Rotate(const Vector3<T>& axis, float_type r) noexcept
         {
 #if defined(TML_USE_DEGREES)
             r *= 0.01745329252;
@@ -601,8 +631,13 @@ namespace tml
             Matrix<3,3,T>::m_rows[2] = Vector4<T>(s6, s7, s8);
         }
 
+        Matrix3x3(const Matrix<3,3,T>& other) noexcept
+        : Matrix<3,3,T>(other)
+        {
 
-        TML_MAYBE_UNUSED inline static Matrix3x3<T> Rotate(const Vector2<T>& axis, float_type r) noexcept
+        }
+
+        TML_MAYBE_UNUSED inline static Matrix3x3<T> Rotate(const Vector3<T>& axis, float_type r) noexcept
         {
 #if defined(TML_USE_DEGREES)
             r *= 0.01745329252;
@@ -668,6 +703,13 @@ namespace tml
         {
             Matrix<2,2,T>::m_rows[0] = Vector4<T>(s0, s1);
             Matrix<2,2,T>::m_rows[1] = Vector4<T>(s2, s3);
+        }
+
+
+        Matrix2x2(const Matrix<2,2,T>& other) noexcept
+        : Matrix<2,2,T>(other)
+        {
+
         }
 
         TML_MAYBE_UNUSED inline static Matrix2x2<T> Rotate(const Vector2<T>& axis, float_type r) noexcept

@@ -29,7 +29,7 @@ void PrintVector(const tml::Vector<N,T>& v)
 int main()
 {
     // Vector - matrix multiplication
-    auto matrix = tml::Matrix4x4f::Rotate(tml::Vector4f(0.f,0.f,1.f,0.f), 90);
+    auto matrix = tml::Matrix4x4f::Rotate(tml::Vector3f(0.f,0.f,1.f), 90);
     auto result = matrix * tml::Vector4f(10.f, 0.f, 0.f, 0.f);
 
     // Matrix - matrix multiplication
