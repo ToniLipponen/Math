@@ -254,12 +254,6 @@ namespace tml
         constexpr static unsigned int elements = N;
 
     protected:
-        T& X() noexcept { return m_data[0]; }
-        T& Y() noexcept { return m_data[1]; }
-        T& Z() noexcept { return m_data[2]; }
-        T& W() noexcept { return m_data[3]; }
-
-    private:
         T m_data[N];
     };
 
@@ -268,8 +262,13 @@ namespace tml
     {
     public:
         using Vector<2, T>::Vector;
-        using Vector<2, T>::X;
-        using Vector<2, T>::Y;
+        Vector2(const Vector<2,T>& other) noexcept
+        : Vector<2, T>(other)
+        {
+
+        }
+        T& X() noexcept { return Vector<2,T>::m_data[0]; }
+        T& Y() noexcept { return Vector<2,T>::m_data[1]; }
     };
 
     template<typename T>
@@ -277,9 +276,14 @@ namespace tml
     {
     public:
         using Vector<3, T>::Vector;
-        using Vector<3, T>::X;
-        using Vector<3, T>::Y;
-        using Vector<3, T>::Z;
+        Vector3(const Vector<3,T>& other) noexcept
+        : Vector<3, T>(other)
+        {
+
+        }
+        T& X() noexcept { return Vector<3,T>::m_data[0]; }
+        T& Y() noexcept { return Vector<3,T>::m_data[1]; }
+        T& Z() noexcept { return Vector<3,T>::m_data[2]; }
     };
 
     template<typename T>
@@ -287,10 +291,15 @@ namespace tml
     {
     public:
         using Vector<4, T>::Vector;
-        using Vector<4, T>::X;
-        using Vector<4, T>::Y;
-        using Vector<4, T>::Z;
-        using Vector<4, T>::W;
+        Vector4(const Vector<4,T>& other) noexcept
+        : Vector<4, T>(other)
+        {
+
+        }
+        T& X() noexcept { return Vector<4,T>::m_data[0]; }
+        T& Y() noexcept { return Vector<4,T>::m_data[1]; }
+        T& Z() noexcept { return Vector<4,T>::m_data[2]; }
+        T& W() noexcept { return Vector<4,T>::m_data[3]; }
     };
 
     template<unsigned int R, unsigned int C, typename T>
