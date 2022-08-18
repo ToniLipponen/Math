@@ -93,8 +93,9 @@ namespace tml
     using int_type = long long;
 #endif
 
-    TML_MAYBE_UNUSED const constexpr float_type float_max = std::numeric_limits<float_type>::max();
-    TML_MAYBE_UNUSED const constexpr int_type int_max = std::numeric_limits<int_type>::max();
+    TML_MAYBE_UNUSED const constexpr static float_type float_max = std::numeric_limits<float_type>::max();
+    TML_MAYBE_UNUSED const constexpr static int_type int_max = std::numeric_limits<int_type>::max();
+    TML_MAYBE_UNUSED const constexpr static float_type epsilon = 0.0001;
 
     template<unsigned int N, typename T>
     class Vector
@@ -415,48 +416,6 @@ namespace tml
             return result;
         }
 
-        constexpr static Matrix<R,C,T> Identity() noexcept
-        {
-            static_assert(R == C, "This function is only defined for square matrices");
-            Matrix<R,C,T> result{};
-
-            for(unsigned int i = 0; i < R; ++i)
-            {
-                for(unsigned int j = 0; j < C; ++j)
-                {
-                    result[i][j] = static_cast<T>(i == j);
-                }
-            }
-
-            return result;
-        }
-
-        TML_MAYBE_UNUSED constexpr static Matrix<R,C,T> Scale(const Vector<C, T>& scale) noexcept
-        {
-            static_assert(R == C, "This function is only defined for square matrices");
-            Matrix<R,C,T> result{};
-
-            for(unsigned int i = 0; i < C; ++i)
-            {
-                result[i][i] = scale[i];
-            }
-
-            return result;
-        }
-
-        TML_MAYBE_UNUSED constexpr static Matrix<R,C,T> Translate(const Vector<C,T>& offset) noexcept
-        {
-            static_assert(R == C, "This function is only defined for square matrices");
-            Matrix<R,C,T> result = Matrix<R,C,T>::Identity();
-
-            for(unsigned int i = 0; i < C; ++i)
-            {
-                result[i][C-1] = offset[i];
-            }
-
-            return result;
-        }
-
         constexpr static unsigned int rows = R;
         constexpr static unsigned int columns = C;
 
@@ -509,6 +468,39 @@ namespace tml
             };
         }
 
+        TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Identity() noexcept
+        {
+            return
+            {
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1,
+            };
+        }
+
+        TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Translate(const Vector3<T>& offset) noexcept
+        {
+            return
+            {
+                1, 0, 0, offset.X(),
+                0, 1, 0, offset.Y(),
+                0, 0, 1, offset.Z(),
+                0, 0, 0, 1,
+            };
+        }
+
+        TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Scale(const Vector3<T>& scale) noexcept
+        {
+            return
+            {
+                scale.X(), 0, 0, 0,
+                0, scale.Y(), 0, 0,
+                0, 0, scale.Z(), 0,
+                0, 0, 0, 1,
+            };
+        }
+
         TML_MAYBE_UNUSED inline static Matrix4x4<T> Rotate(const Vector3<T>& axis, float_type r) noexcept
         {
 #if defined(TML_USE_DEGREES)
@@ -519,7 +511,7 @@ namespace tml
             const auto zero = static_cast<T>(0);
             const auto one  = static_cast<T>(1);
 
-            if(axis[0] > 0)
+            if(axis[0] > epsilon)
             {
                 return Matrix4x4<T>(
                         Vector4<T>(one, zero, zero, zero),
@@ -528,7 +520,7 @@ namespace tml
                         Vector4<T>(zero, zero, zero, one)
                 );
             }
-            else if(axis[1] > 0)
+            else if(axis[1] > epsilon)
             {
                 return Matrix4x4<T>(
                         Vector4<T>(cosr, zero, sinr, zero),
@@ -637,6 +629,36 @@ namespace tml
 
         }
 
+        TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Identity() noexcept
+        {
+            return
+            {
+                1, 0, 0,
+                0, 1, 0,
+                0, 0, 1
+            };
+        }
+
+        TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Translate(const Vector2<T>& offset) noexcept
+        {
+            return
+            {
+                1, 0, offset.X(),
+                0, 1, offset.Y(),
+                0, 0, 1,
+            };
+        }
+
+        TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Scale(const Vector2<T>& scale) noexcept
+        {
+            return
+            {
+                    scale.X(), 0, 0,
+                    0, scale.Y(), 0,
+                    0, 0, 1,
+            };
+        }
+
         TML_MAYBE_UNUSED inline static Matrix3x3<T> Rotate(const Vector3<T>& axis, float_type r) noexcept
         {
 #if defined(TML_USE_DEGREES)
@@ -647,14 +669,14 @@ namespace tml
             const auto zero = static_cast<T>(0);
             const auto one  = static_cast<T>(1);
 
-            if(axis[0] > 0)
+            if(axis[0] > epsilon)
             {
                 return Matrix3x3<T>(
                         Vector3<T>(one, zero, zero),
                         Vector3<T>(zero, cosr, -sinr),
                         Vector3<T>(zero, sinr, cosr));
             }
-            else if(axis[1] > 0)
+            else if(axis[1] > epsilon)
             {
                 return Matrix3x3<T>(
                         Vector3<T>(cosr, zero, sinr),
@@ -710,6 +732,15 @@ namespace tml
         : Matrix<2,2,T>(other)
         {
 
+        }
+
+        TML_MAYBE_UNUSED constexpr static Matrix2x2<T> Identity() noexcept
+        {
+            return
+            {
+                1, 0,
+                0, 1
+            };
         }
 
         TML_MAYBE_UNUSED inline static Matrix2x2<T> Rotate(const Vector2<T>& axis, float_type r) noexcept
