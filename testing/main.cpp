@@ -33,14 +33,14 @@ int main()
     tml::Vector4f result = matrix * tml::Vector4f(10.f, 0.f, 0.f, 0.f);
 
     // Matrix - matrix multiplication
-    auto m1 = tml::Matrix<3,2,float>(
-            tml::Vector2f(1.f, 2.f),
-            tml::Vector2f(3.f, 4.f),
-            tml::Vector2f(5.f, 1.f));
+    tml::Matrix<3,2,float> m1;
+    m1[0] = tml::Vector2f{1.f, 2.f};
+    m1[1] = tml::Vector2f{3.f, 4.f};
+    m1[2] = tml::Vector2f{5.f, 1.f};
 
-    auto m2 = tml::Matrix<2,1,float>(
-            tml::Vector<1,float>(2.f),
-            tml::Vector<1,float>(4.f));
+    tml::Matrix<2,1,float> m2;
+    m2[0] = tml::Vector<1,float>{2.f};
+    m2[1] = tml::Vector<1,float>{4.f};
 
     auto m3 = m1 * m2;
 

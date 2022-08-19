@@ -29,7 +29,9 @@
 
 #if __cplusplus > 201402L
 #define TML_MAYBE_UNUSED [[maybe_unused]]
+#define TML_NODISCARD [[nodiscard]]
 #else
+#define TML_NODISCARD
 #if defined(_MSC_VER)
 #define TML_MAYBE_UNUSED
 #else
@@ -130,7 +132,7 @@ namespace tml
 
         template<typename ... A>
         constexpr explicit Vector(const A& ... args) noexcept
-                : m_data{static_cast<T>(args) ...}
+                : m_data{args ...}
         {
             static_assert(std::is_arithmetic<T>::value, "T has to be an arithmetic type");
             static_assert(N > 0, "N has to be greater than 0");
@@ -204,7 +206,7 @@ namespace tml
         TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(*);
         TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(/);
 
-        constexpr float_type Length() const noexcept
+        TML_NODISCARD constexpr float_type Length() const noexcept
         {
             float_type length = 0;
 
@@ -216,17 +218,17 @@ namespace tml
             return static_cast<float_type>(sqrt(length));
         }
 
-        TML_MAYBE_UNUSED constexpr Vector<N, T> Normalized() const noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr Vector<N, T> Normalized() const noexcept
         {
             return *this / Length();
         }
 
-        TML_MAYBE_UNUSED constexpr Vector<N, T>& Normalize() noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr Vector<N, T>& Normalize() noexcept
         {
             return *this /= Length();
         }
 
-        constexpr double Dot(const Vector<N, T>& other) const noexcept
+        TML_NODISCARD constexpr double Dot(const Vector<N, T>& other) const noexcept
         {
             double result = 0;
 
@@ -238,7 +240,7 @@ namespace tml
             return result;
         }
 
-        TML_MAYBE_UNUSED constexpr Vector<N, T> Cross(const Vector<N, T>& other) const noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr Vector<N, T> Cross(const Vector<N, T>& other) const noexcept
         {
             Vector<N, T> result;
 
@@ -339,7 +341,7 @@ namespace tml
             std::swap(m_rows, other.m_rows);
         }
 
-        virtual ~Matrix() noexcept = default;
+        virtual ~Matrix() noexcept {}
 
         Matrix<R,C,T>& operator=(const Matrix<R,C,T>& other) noexcept
         {
@@ -487,19 +489,18 @@ namespace tml
             const auto one = static_cast<float_type>(1);
 
             return Matrix4x4<float_type>
-                    {
-                            two / (right - left), zero, zero, zero,
-                            zero, two / (top - bottom), zero, zero,
-                            zero, zero, -two / (far - near), zero,
-                            -(right + left) / (right - left), -(top + bottom) / (top - bottom),
-                            -(far + near) / (far - near), one
-                    };
+            {
+                two / (right - left), zero, zero, zero,
+                zero, two / (top - bottom), zero, zero,
+                zero, zero, -two / (far - near), zero,
+                -(right + left) / (right - left), -(top + bottom) / (top - bottom),
+                -(far + near) / (far - near), one
+            };
         }
 
         TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Identity() noexcept
         {
-            return
-            Matrix4x4<T>{
+            return Matrix4x4<T>{
                 1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
@@ -520,8 +521,7 @@ namespace tml
 
         TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Scale(const Vector3<T>& scale) noexcept
         {
-            return
-            {
+            return Matrix4x4<T>{
                 scale.X(), 0, 0, 0,
                 0, scale.Y(), 0, 0,
                 0, 0, scale.Z(), 0,
@@ -542,27 +542,27 @@ namespace tml
             if(axis[0] > epsilon)
             {
                 return Matrix4x4<T>(
-                        one, zero, zero, zero,
-                        zero, cosr, -sinr, zero,
-                        zero, sinr, cosr, zero,
-                        zero, zero, zero, one
+                    one, zero, zero, zero,
+                    zero, cosr, -sinr, zero,
+                    zero, sinr, cosr, zero,
+                    zero, zero, zero, one
                 );
             }
             else if(axis[1] > epsilon)
             {
                 return Matrix4x4<T>(
-                        cosr, zero, sinr, zero,
-                        zero, one, zero, zero,
-                        -sinr, zero, cosr, zero,
-                        zero, zero, zero, one);
+                    cosr, zero, sinr, zero,
+                    zero, one, zero, zero,
+                    -sinr, zero, cosr, zero,
+                    zero, zero, zero, one);
             }
             else
             {
                 return Matrix4x4<T>(
-                        cosr, -sinr, zero, zero,
-                        sinr, cosr, zero, zero,
-                        zero, zero, one, zero,
-                        zero, zero, zero, one);
+                    cosr, -sinr, zero, zero,
+                    sinr, cosr, zero, zero,
+                    zero, zero, one, zero,
+                    zero, zero, zero, one);
             }
         }
 
@@ -610,17 +610,17 @@ namespace tml
             const Vector<4,T> inv3(vec0 * fac2 - vec1 * fac4 + vec2 * fac5);
 
             const Vector<4,T> SignA(
-                    static_cast<T>( 1),
-                    static_cast<T>(-1),
-                    static_cast<T>( 1),
-                    static_cast<T>(-1)
+                static_cast<T>( 1),
+                static_cast<T>(-1),
+                static_cast<T>( 1),
+                static_cast<T>(-1)
             );
 
             const Vector<4,T> SignB(
-                    static_cast<T>(-1),
-                    static_cast<T>( 1),
-                    static_cast<T>(-1),
-                    static_cast<T>( 1)
+                static_cast<T>(-1),
+                static_cast<T>( 1),
+                static_cast<T>(-1),
+                static_cast<T>( 1)
             );
 
             const Matrix4x4<T> inverse(inv0 * SignA, inv1 * SignB, inv2 * SignA, inv3 * SignB);
@@ -668,31 +668,31 @@ namespace tml
         TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Identity() noexcept
         {
             return
-                    {
-                            1, 0, 0,
-                            0, 1, 0,
-                            0, 0, 1
-                    };
+            {
+                1, 0, 0,
+                0, 1, 0,
+                0, 0, 1
+            };
         }
 
         TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Translate(const Vector2<T>& offset) noexcept
         {
             return
-                    {
-                            1, 0, offset.X(),
-                            0, 1, offset.Y(),
-                            0, 0, 1,
-                    };
+            {
+                1, 0, offset.X(),
+                0, 1, offset.Y(),
+                0, 0, 1,
+            };
         }
 
         TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Scale(const Vector2<T>& scale) noexcept
         {
             return
-                    {
-                            scale.X(), 0, 0,
-                            0, scale.Y(), 0,
-                            0, 0, 1,
-                    };
+            {
+                scale.X(), 0, 0,
+                0, scale.Y(), 0,
+                0, 0, 1,
+            };
         }
 
         TML_MAYBE_UNUSED inline static Matrix3x3<T> Rotate(const Vector3<T>& axis, float_type r) noexcept
