@@ -250,8 +250,7 @@ namespace tml
             return result;
         }
 
-    public:
-        constexpr static unsigned int elements = N;
+        const unsigned int elements = N;
 
     protected:
         T m_data[N];
@@ -425,8 +424,8 @@ namespace tml
             return result;
         }
 
-        constexpr static unsigned int rows = R;
-        constexpr static unsigned int columns = C;
+        const unsigned int rows = R;
+        const unsigned int columns = C;
 
     protected:
         Vector<C, T> m_rows[R];
@@ -460,7 +459,7 @@ namespace tml
                 float_type right,
                 float_type top,
                 float_type bottom,
-                float_type near = 0,
+                float_type near = tml::epsilon,
                 float_type far = tml::float_max) noexcept
         {
             const auto two = static_cast<float_type>(2);
@@ -605,12 +604,9 @@ namespace tml
             );
 
             const Matrix<4,4,T> inverse(inv0 * SignA, inv1 * SignB, inv2 * SignA, inv3 * SignB);
-
             const Vector<4,T> row0(inverse[0][0], inverse[1][0], inverse[2][0], inverse[3][0]);
-
             const Vector<4,T> dot0(m[0] * row0);
             const T dot1 = (dot0[0] + dot0[1]) + (dot0[2] + dot0[3]);
-
             const T oneOverDeterminant = static_cast<T>(1) / dot1;
 
             return inverse * oneOverDeterminant;
@@ -662,9 +658,9 @@ namespace tml
         {
             return
             {
-                    scale.X(), 0, 0,
-                    0, scale.Y(), 0,
-                    0, 0, 1,
+                scale.X(), 0, 0,
+                0, scale.Y(), 0,
+                0, 0, 1,
             };
         }
 

@@ -30,7 +30,7 @@ int main()
 {
     // Vector - matrix multiplication
     auto matrix = tml::Matrix4x4f::Rotate(tml::Vector3f(0.f,0.f,1.f), 90);
-    auto result = matrix * tml::Vector4f(10.f, 0.f, 0.f, 0.f);
+    tml::Vector4f result = matrix * tml::Vector4f(10.f, 0.f, 0.f, 0.f);
 
     // Matrix - matrix multiplication
     auto m1 = tml::Matrix<3,2,float>(
