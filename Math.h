@@ -26,6 +26,7 @@
 #include <type_traits>
 #include <limits>
 #include <cmath>
+#include <array>
 
 #if __cplusplus > 201402L
 #define TML_MAYBE_UNUSED [[maybe_unused]]
@@ -104,35 +105,34 @@ namespace tml
     {
     public:
         constexpr Vector() noexcept
+        : m_data{0}
         {
             static_assert(std::is_arithmetic<T>::value, "T has to be an arithmetic type");
             static_assert(N > 0, "N has to be greater than 0");
         }
 
-        explicit constexpr Vector(T scalar) noexcept
+        template<typename A>
+        explicit constexpr Vector(A scalar) noexcept
+        : Vector()
         {
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                m_data[i] = scalar;
-            }
+            m_data.fill(static_cast<T>(scalar));
         }
 
         constexpr Vector(const Vector<N, T>& vector) noexcept
+        : Vector()
         {
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                m_data[i] = vector.m_data[i];
-            }
+            m_data = vector.m_data;
         }
 
         constexpr Vector(Vector<N, T>&& vector) noexcept
+        : Vector()
         {
             std::swap(m_data, vector.m_data);
         }
 
         template<typename ... A>
         constexpr explicit Vector(const A& ... args) noexcept
-                : m_data{args ...}
+        : m_data{static_cast<T>(args) ...}
         {
             static_assert(std::is_arithmetic<T>::value, "T has to be an arithmetic type");
             static_assert(N > 0, "N has to be greater than 0");
@@ -142,22 +142,19 @@ namespace tml
 
         constexpr T& operator[](unsigned int index) noexcept
         {
-            return m_data[index];
+            return m_data.at(index);
         }
 
         constexpr T operator[](unsigned int index) const noexcept
         {
-            return m_data[index];
+            return m_data.at(index);
         }
 
         constexpr Vector<N,T>& operator=(const Vector<N,T>& other) noexcept
         {
             if(&other != this)
             {
-                for(unsigned int i = 0; i < N; ++i)
-                {
-                    m_data[i] = other.m_data[i];
-                }
+                m_data = other.m_data;
             }
 
             return *this;
@@ -175,15 +172,7 @@ namespace tml
 
         constexpr bool operator==(const Vector<N,T>& other) noexcept
         {
-            for(unsigned int i = 0; i < N; ++i)
-            {
-                if(m_data[i] != other.m_data[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return m_data == other.m_data;
         }
 
         TML_DEFINE_VECTOR_OPERATOR_SCALAR(+);
@@ -206,9 +195,9 @@ namespace tml
         TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(*);
         TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(/);
 
-        TML_NODISCARD constexpr float_type Length() const noexcept
+        TML_NODISCARD constexpr T Length() const noexcept
         {
-            float_type length = 0;
+            T length = 0;
 
             for(unsigned int i = 0; i < N; ++i)
             {
@@ -228,9 +217,9 @@ namespace tml
             return *this /= Length();
         }
 
-        TML_NODISCARD constexpr double Dot(const Vector<N, T>& other) const noexcept
+        TML_NODISCARD constexpr T Dot(const Vector<N, T>& other) const noexcept
         {
-            double result = 0;
+            T result = 0;
 
             for(unsigned int i = 0; i < N; ++i)
             {
@@ -255,7 +244,7 @@ namespace tml
         const unsigned int elements = N;
 
     protected:
-        T m_data[N];
+        std::array<T, N> m_data;
     };
 
     template<typename T>
@@ -330,10 +319,7 @@ namespace tml
 
         Matrix(const Matrix<R,C,T>& other) noexcept
         {
-            for(unsigned int i = 0; i < R; ++i)
-            {
-                m_rows[i] = other.m_rows[i];
-            }
+            m_rows = other.m_rows;
         }
 
         Matrix(Matrix<R,C,T>&& other) noexcept
@@ -347,10 +333,7 @@ namespace tml
         {
             if(this != &other)
             {
-                for(unsigned int i = 0; i < R; ++i)
-                {
-                    m_rows[i] = other.m_rows[i];
-                }
+                m_rows = other.m_rows;
             }
 
             return *this;
@@ -364,12 +347,12 @@ namespace tml
 
         constexpr Vector<C, T>& operator[](unsigned int index) noexcept
         {
-            return m_rows[index];
+            return m_rows.at(index);
         }
 
         constexpr Vector<C, T> operator[](unsigned int index) const noexcept
         {
-            return m_rows[index];
+            return m_rows.at(index);
         }
 
         template<unsigned int R2, unsigned C2>
@@ -403,10 +386,7 @@ namespace tml
 
             for(unsigned int i = 0; i < R; ++i)
             {
-                for(unsigned int j = 0; j < C; ++j)
-                {
-                    result[i][j] = m_rows[i][j] * scalar;
-                }
+                result[i] = m_rows[i] * scalar;
             }
 
             return result;
@@ -433,11 +413,20 @@ namespace tml
             return result;
         }
 
+        template<typename ... Args>
+        constexpr static Matrix<R,C,T> Create(const Args& ... args) noexcept
+        {
+            Matrix<R,C,T> result{};
+            result.m_rows = {args...};
+            return result;
+        }
+
         const unsigned int rows = R;
         const unsigned int columns = C;
 
     protected:
-        Vector<C, T> m_rows[R];
+//        Vector<C, T> m_rows[R];
+        std::array<Vector<C,T>, R> m_rows;
     };
 
     template<typename T>
