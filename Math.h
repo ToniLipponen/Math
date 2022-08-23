@@ -100,6 +100,9 @@ namespace tml
     TML_MAYBE_UNUSED const constexpr static int_type int_max = std::numeric_limits<int_type>::max();
     TML_MAYBE_UNUSED const constexpr static float_type epsilon = 0.0001;
 
+#if defined(TML_PACK_STRUCT_DATA)
+    #pragma pack(push, 1)
+#endif
     template<unsigned int N, typename T>
     class Vector
     {
@@ -115,13 +118,13 @@ namespace tml
         explicit constexpr Vector(A scalar) noexcept
         : Vector()
         {
-            m_data.fill(static_cast<T>(scalar));
+            std::fill(std::begin(m_data), std::end(m_data), scalar);
         }
 
         constexpr Vector(const Vector<N, T>& vector) noexcept
         : Vector()
         {
-            m_data = vector.m_data;
+            std::copy(std::begin(vector.m_data), std::end(vector.m_data), std::begin(m_data));
         }
 
         constexpr Vector(Vector<N, T>&& vector) noexcept
@@ -137,8 +140,6 @@ namespace tml
             static_assert(std::is_arithmetic<T>::value, "T has to be an arithmetic type");
             static_assert(N > 0, "N has to be greater than 0");
         }
-
-        virtual ~Vector() noexcept = default;
 
         constexpr T& operator[](unsigned int index) noexcept
         {
@@ -175,27 +176,27 @@ namespace tml
             return m_data == other.m_data;
         }
 
-        TML_DEFINE_VECTOR_OPERATOR_SCALAR(+);
-        TML_DEFINE_VECTOR_OPERATOR_SCALAR(-);
-        TML_DEFINE_VECTOR_OPERATOR_SCALAR(*);
-        TML_DEFINE_VECTOR_OPERATOR_SCALAR(/);
+        TML_NODISCARD TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_SCALAR(+);
+        TML_NODISCARD TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_SCALAR(-);
+        TML_NODISCARD TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_SCALAR(*);
+        TML_NODISCARD TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_SCALAR(/);
 
-        TML_DEFINE_VECTOR_OPERATOR_VECTOR(+);
-        TML_DEFINE_VECTOR_OPERATOR_VECTOR(-);
-        TML_DEFINE_VECTOR_OPERATOR_VECTOR(*);
-        TML_DEFINE_VECTOR_OPERATOR_VECTOR(/);
+        TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(+);
+        TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(-);
+        TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(*);
+        TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(/);
 
-        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(+);
-        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(-);
-        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(*);
-        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(/);
+        TML_NODISCARD TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_VECTOR(+);
+        TML_NODISCARD TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_VECTOR(-);
+        TML_NODISCARD TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_VECTOR(*);
+        TML_NODISCARD TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_VECTOR(/);
 
-        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(+);
-        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(-);
-        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(*);
-        TML_DEFINE_VECTOR_OPERATOR_ASSIGN_SCALAR(/);
+        TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(+);
+        TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(-);
+        TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(*);
+        TML_MAYBE_UNUSED TML_DEFINE_VECTOR_OPERATOR_ASSIGN_VECTOR(/);
 
-        TML_NODISCARD constexpr T Length() const noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr T Length() const noexcept
         {
             T length = 0;
 
@@ -217,7 +218,7 @@ namespace tml
             return *this /= Length();
         }
 
-        TML_NODISCARD constexpr T Dot(const Vector<N, T>& other) const noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr T Dot(const Vector<N, T>& other) const noexcept
         {
             T result = 0;
 
@@ -241,11 +242,14 @@ namespace tml
             return result;
         }
 
-        const unsigned int elements = N;
+        constexpr static unsigned int elements = N;
 
     protected:
-        std::array<T, N> m_data;
+        std::array<T, N> m_data{0};
     };
+#if defined(TML_PACK_STRUCT_DATA)
+    #pragma pack(pop)
+#endif
 
     template<typename T>
     class Vector2 : public Vector<2, T>
@@ -261,8 +265,8 @@ namespace tml
         TML_MAYBE_UNUSED T& X() noexcept { return Vector<2,T>::m_data[0]; }
         TML_MAYBE_UNUSED T& Y() noexcept { return Vector<2,T>::m_data[1]; }
 
-        TML_MAYBE_UNUSED const T& X() const noexcept { return Vector<2,T>::m_data[0]; }
-        TML_MAYBE_UNUSED const T& Y() const noexcept { return Vector<2,T>::m_data[1]; }
+        TML_MAYBE_UNUSED T& X() const noexcept { return Vector<2,T>::m_data[0]; }
+        TML_MAYBE_UNUSED T& Y() const noexcept { return Vector<2,T>::m_data[1]; }
     };
 
     template<typename T>
@@ -280,9 +284,17 @@ namespace tml
         TML_MAYBE_UNUSED T& Y() noexcept { return Vector<3,T>::m_data[1]; }
         TML_MAYBE_UNUSED T& Z() noexcept { return Vector<3,T>::m_data[2]; }
 
-        TML_MAYBE_UNUSED const T& X() const noexcept { return Vector<3,T>::m_data[0]; }
-        TML_MAYBE_UNUSED const T& Y() const noexcept { return Vector<3,T>::m_data[1]; }
-        TML_MAYBE_UNUSED const T& Z() const noexcept { return Vector<3,T>::m_data[2]; }
+        TML_MAYBE_UNUSED T& X() const noexcept { return Vector<3,T>::m_data[0]; }
+        TML_MAYBE_UNUSED T& Y() const noexcept { return Vector<3,T>::m_data[1]; }
+        TML_MAYBE_UNUSED T& Z() const noexcept { return Vector<3,T>::m_data[2]; }
+
+        TML_MAYBE_UNUSED T& R() noexcept { return Vector<3,T>::m_data[0]; }
+        TML_MAYBE_UNUSED T& G() noexcept { return Vector<3,T>::m_data[1]; }
+        TML_MAYBE_UNUSED T& B() noexcept { return Vector<3,T>::m_data[2]; }
+
+        TML_MAYBE_UNUSED T& R() const noexcept { return Vector<3,T>::m_data[0]; }
+        TML_MAYBE_UNUSED T& G() const noexcept { return Vector<3,T>::m_data[1]; }
+        TML_MAYBE_UNUSED T& B() const noexcept { return Vector<3,T>::m_data[2]; }
     };
 
     template<typename T>
@@ -301,12 +313,25 @@ namespace tml
         TML_MAYBE_UNUSED T& Z() noexcept { return Vector<4,T>::m_data[2]; }
         TML_MAYBE_UNUSED T& W() noexcept { return Vector<4,T>::m_data[3]; }
 
-        TML_MAYBE_UNUSED const T& X() const noexcept { return Vector<4,T>::m_data[0]; }
-        TML_MAYBE_UNUSED const T& Y() const noexcept { return Vector<4,T>::m_data[1]; }
-        TML_MAYBE_UNUSED const T& Z() const noexcept { return Vector<4,T>::m_data[2]; }
-        TML_MAYBE_UNUSED const T& W() const noexcept { return Vector<4,T>::m_data[3]; }
+        TML_MAYBE_UNUSED T& X() const noexcept { return Vector<4,T>::m_data[0]; }
+        TML_MAYBE_UNUSED T& Y() const noexcept { return Vector<4,T>::m_data[1]; }
+        TML_MAYBE_UNUSED T& Z() const noexcept { return Vector<4,T>::m_data[2]; }
+        TML_MAYBE_UNUSED T& W() const noexcept { return Vector<4,T>::m_data[3]; }
+
+        TML_MAYBE_UNUSED T& R() noexcept { return Vector<4,T>::m_data[0]; }
+        TML_MAYBE_UNUSED T& G() noexcept { return Vector<4,T>::m_data[1]; }
+        TML_MAYBE_UNUSED T& B() noexcept { return Vector<4,T>::m_data[2]; }
+        TML_MAYBE_UNUSED T& A() noexcept { return Vector<4,T>::m_data[3]; }
+
+        TML_MAYBE_UNUSED T& R() const noexcept { return Vector<4,T>::m_data[0]; }
+        TML_MAYBE_UNUSED T& G() const noexcept { return Vector<4,T>::m_data[1]; }
+        TML_MAYBE_UNUSED T& B() const noexcept { return Vector<4,T>::m_data[2]; }
+        TML_MAYBE_UNUSED T& A() const noexcept { return Vector<4,T>::m_data[3]; }
     };
 
+#if defined(TML_PACK_STRUCT_DATA)
+#pragma pack(push, 1)
+#endif
     template<unsigned int R, unsigned int C, typename T>
     class Matrix
     {
@@ -327,8 +352,6 @@ namespace tml
             std::swap(m_rows, other.m_rows);
         }
 
-        virtual ~Matrix() noexcept {}
-
         Matrix<R,C,T>& operator=(const Matrix<R,C,T>& other) noexcept
         {
             if(this != &other)
@@ -345,18 +368,18 @@ namespace tml
             return *this;
         }
 
-        constexpr Vector<C, T>& operator[](unsigned int index) noexcept
+        TML_MAYBE_UNUSED constexpr Vector<C, T>& operator[](unsigned int index) noexcept
         {
             return m_rows.at(index);
         }
 
-        constexpr Vector<C, T> operator[](unsigned int index) const noexcept
+        TML_MAYBE_UNUSED constexpr Vector<C, T> operator[](unsigned int index) const noexcept
         {
             return m_rows.at(index);
         }
 
         template<unsigned int R2, unsigned C2>
-        constexpr Matrix<R,C2,T> operator*(const Matrix<R2,C2,T>& other) const noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr Matrix<R,C2,T> operator*(const Matrix<R2,C2,T>& other) const noexcept
         {
             Matrix<R,C2,T> result{};
 
@@ -380,7 +403,7 @@ namespace tml
             return result;
         }
 
-        constexpr Matrix<R,C,T> operator*(T scalar) const noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr Matrix<R,C,T> operator*(T scalar) const noexcept
         {
             Matrix<R,C,T> result{};
 
@@ -392,7 +415,7 @@ namespace tml
             return result;
         }
 
-        constexpr Vector<R,T> operator*(const Vector<R,T>& vector) const noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr Vector<R,T> operator*(const Vector<R,T>& vector) const noexcept
         {
             Matrix<R, 1, T> matrix;
 
@@ -414,20 +437,23 @@ namespace tml
         }
 
         template<typename ... Args>
-        constexpr static Matrix<R,C,T> Create(const Args& ... args) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr static Matrix<R,C,T> Create(const Args& ... args) noexcept
         {
             Matrix<R,C,T> result{};
             result.m_rows = {args...};
             return result;
         }
 
-        const unsigned int rows = R;
-        const unsigned int columns = C;
+        constexpr static unsigned int rows = R;
+        constexpr static unsigned int columns = C;
 
     protected:
-//        Vector<C, T> m_rows[R];
         std::array<Vector<C,T>, R> m_rows;
     };
+
+#if defined(TML_PACK_STRUCT_DATA)
+#pragma pack(pop)
+#endif
 
     template<typename T>
     class Matrix4x4 : public Matrix<4,4,T>
@@ -465,7 +491,7 @@ namespace tml
 
         }
 
-        TML_MAYBE_UNUSED static Matrix4x4<float_type> Orthographic(
+        TML_NODISCARD TML_MAYBE_UNUSED static Matrix4x4<float_type> Orthographic(
                 float_type left,
                 float_type right,
                 float_type top,
@@ -487,7 +513,7 @@ namespace tml
             };
         }
 
-        TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Identity() noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Identity() noexcept
         {
             return Matrix4x4<T>{
                 1, 0, 0, 0,
@@ -497,7 +523,7 @@ namespace tml
             };
         }
 
-        TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Translate(const Vector3<T>& offset) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Translate(const Vector3<T>& offset) noexcept
         {
             return
             {
@@ -508,7 +534,7 @@ namespace tml
             };
         }
 
-        TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Scale(const Vector3<T>& scale) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr static Matrix4x4<T> Scale(const Vector3<T>& scale) noexcept
         {
             return Matrix4x4<T>{
                 scale.X(), 0, 0, 0,
@@ -518,7 +544,7 @@ namespace tml
             };
         }
 
-        TML_MAYBE_UNUSED inline static Matrix4x4<T> Rotate(const Vector3<T>& axis, float_type r) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED inline static Matrix4x4<T> Rotate(const Vector3<T>& axis, float_type r) noexcept
         {
 #if defined(TML_USE_DEGREES)
             r *= 0.01745329252;
@@ -555,7 +581,7 @@ namespace tml
             }
         }
 
-        TML_MAYBE_UNUSED inline constexpr static Matrix4x4<T> Inverse(const Matrix4x4<T>& m) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED inline constexpr static Matrix4x4<T> Inverse(const Matrix4x4<T>& m) noexcept
         {
             const T coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
             const T coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
@@ -654,7 +680,7 @@ namespace tml
 
         }
 
-        TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Identity() noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED static constexpr Matrix3x3<T> Identity() noexcept
         {
             return
             {
@@ -664,7 +690,7 @@ namespace tml
             };
         }
 
-        TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Translate(const Vector2<T>& offset) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED static constexpr Matrix3x3<T> Translate(const Vector2<T>& offset) noexcept
         {
             return
             {
@@ -674,7 +700,7 @@ namespace tml
             };
         }
 
-        TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Scale(const Vector2<T>& scale) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED static constexpr Matrix3x3<T> Scale(const Vector2<T>& scale) noexcept
         {
             return
             {
@@ -684,7 +710,7 @@ namespace tml
             };
         }
 
-        TML_MAYBE_UNUSED inline static Matrix3x3<T> Rotate(const Vector3<T>& axis, float_type r) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED static constexpr Matrix3x3<T> Rotate(const Vector3<T>& axis, float_type r) noexcept
         {
 #if defined(TML_USE_DEGREES)
             r *= 0.01745329252;
@@ -717,7 +743,7 @@ namespace tml
             }
         }
 
-        TML_MAYBE_UNUSED constexpr static Matrix3x3<T> Inverse(const Matrix3x3<T>& m) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED static constexpr Matrix3x3<T> Inverse(const Matrix3x3<T>& m) noexcept
         {
             T oneOverDeterminant = static_cast<T>(1) / (
                     m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2])
@@ -767,7 +793,7 @@ namespace tml
 
         }
 
-        TML_MAYBE_UNUSED constexpr static Matrix2x2<T> Identity() noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED static constexpr Matrix2x2<T> Identity() noexcept
         {
             return
             {
@@ -776,7 +802,7 @@ namespace tml
             };
         }
 
-        TML_MAYBE_UNUSED inline static Matrix2x2<T> Rotate(const Vector2<T>& axis, float_type r) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED static Matrix2x2<T> Rotate(const Vector2<T>& axis, float_type r) noexcept
         {
 #if defined(TML_USE_DEGREES)
             r *= 0.01745329252;
@@ -789,7 +815,7 @@ namespace tml
                     Vector2<T>(sinr, cosr));
         }
 
-        TML_MAYBE_UNUSED constexpr static Matrix2x2<T> Inverse(const Matrix2x2<T>& m) noexcept
+        TML_NODISCARD TML_MAYBE_UNUSED constexpr static Matrix2x2<T> Inverse(const Matrix2x2<T>& m) noexcept
         {
             T oneOverDeterminant = static_cast<T>(1) / (
                     m[0][0] * m[1][1]
@@ -804,7 +830,7 @@ namespace tml
     };
 
     template<typename T>
-    TML_MAYBE_UNUSED Matrix4x4<T> Translate(const Matrix4x4<T>& matrix, const Vector3<T>& vector) noexcept
+    TML_NODISCARD TML_MAYBE_UNUSED Matrix4x4<T> Translate(const Matrix4x4<T>& matrix, const Vector3<T>& vector) noexcept
     {
         Matrix4x4<T> result{matrix};
         result[0][3] += vector.X();
@@ -815,13 +841,13 @@ namespace tml
     }
 
     template<typename T>
-    TML_MAYBE_UNUSED Matrix4x4<T> Rotate(const Matrix4x4<T>& matrix, const Vector3<T>& vector, float_type angle) noexcept
+    TML_NODISCARD TML_MAYBE_UNUSED Matrix4x4<T> Rotate(const Matrix4x4<T>& matrix, const Vector3<T>& vector, float_type angle) noexcept
     {
         return matrix * Matrix4x4<T>::Rotate(vector, angle);
     }
 
     template<typename T>
-    TML_MAYBE_UNUSED Matrix4x4<T> Scale(const Matrix4x4<T>& matrix, const Vector3<T>& vector) noexcept
+    TML_NODISCARD TML_MAYBE_UNUSED Matrix4x4<T> Scale(const Matrix4x4<T>& matrix, const Vector3<T>& vector) noexcept
     {
         return matrix * Matrix4x4<T>::Scale(vector);
     }
