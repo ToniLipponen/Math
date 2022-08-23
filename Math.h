@@ -101,7 +101,7 @@ namespace tml
     TML_MAYBE_UNUSED const constexpr static float_type epsilon = 0.0001;
 
 #if defined(TML_PACK_STRUCT_DATA)
-    #pragma pack(push, 1)
+#pragma pack(push, 1)
 #endif
     template<unsigned int N, typename T>
     class Vector
@@ -248,7 +248,7 @@ namespace tml
         std::array<T, N> m_data{0};
     };
 #if defined(TML_PACK_STRUCT_DATA)
-    #pragma pack(pop)
+#pragma pack(pop)
 #endif
 
     template<typename T>
@@ -265,8 +265,8 @@ namespace tml
         TML_MAYBE_UNUSED T& X() noexcept { return Vector<2,T>::m_data[0]; }
         TML_MAYBE_UNUSED T& Y() noexcept { return Vector<2,T>::m_data[1]; }
 
-        TML_MAYBE_UNUSED T& X() const noexcept { return Vector<2,T>::m_data[0]; }
-        TML_MAYBE_UNUSED T& Y() const noexcept { return Vector<2,T>::m_data[1]; }
+        TML_MAYBE_UNUSED const T& X() const noexcept { return Vector<2,T>::m_data[0]; }
+        TML_MAYBE_UNUSED const T& Y() const noexcept { return Vector<2,T>::m_data[1]; }
     };
 
     template<typename T>
@@ -284,17 +284,17 @@ namespace tml
         TML_MAYBE_UNUSED T& Y() noexcept { return Vector<3,T>::m_data[1]; }
         TML_MAYBE_UNUSED T& Z() noexcept { return Vector<3,T>::m_data[2]; }
 
-        TML_MAYBE_UNUSED T& X() const noexcept { return Vector<3,T>::m_data[0]; }
-        TML_MAYBE_UNUSED T& Y() const noexcept { return Vector<3,T>::m_data[1]; }
-        TML_MAYBE_UNUSED T& Z() const noexcept { return Vector<3,T>::m_data[2]; }
+        TML_MAYBE_UNUSED const T& X() const noexcept { return Vector<3,T>::m_data[0]; }
+        TML_MAYBE_UNUSED const T& Y() const noexcept { return Vector<3,T>::m_data[1]; }
+        TML_MAYBE_UNUSED const T& Z() const noexcept { return Vector<3,T>::m_data[2]; }
 
         TML_MAYBE_UNUSED T& R() noexcept { return Vector<3,T>::m_data[0]; }
         TML_MAYBE_UNUSED T& G() noexcept { return Vector<3,T>::m_data[1]; }
         TML_MAYBE_UNUSED T& B() noexcept { return Vector<3,T>::m_data[2]; }
 
-        TML_MAYBE_UNUSED T& R() const noexcept { return Vector<3,T>::m_data[0]; }
-        TML_MAYBE_UNUSED T& G() const noexcept { return Vector<3,T>::m_data[1]; }
-        TML_MAYBE_UNUSED T& B() const noexcept { return Vector<3,T>::m_data[2]; }
+        TML_MAYBE_UNUSED const T& R() const noexcept { return Vector<3,T>::m_data[0]; }
+        TML_MAYBE_UNUSED const T& G() const noexcept { return Vector<3,T>::m_data[1]; }
+        TML_MAYBE_UNUSED const T& B() const noexcept { return Vector<3,T>::m_data[2]; }
     };
 
     template<typename T>
@@ -313,20 +313,20 @@ namespace tml
         TML_MAYBE_UNUSED T& Z() noexcept { return Vector<4,T>::m_data[2]; }
         TML_MAYBE_UNUSED T& W() noexcept { return Vector<4,T>::m_data[3]; }
 
-        TML_MAYBE_UNUSED T& X() const noexcept { return Vector<4,T>::m_data[0]; }
-        TML_MAYBE_UNUSED T& Y() const noexcept { return Vector<4,T>::m_data[1]; }
-        TML_MAYBE_UNUSED T& Z() const noexcept { return Vector<4,T>::m_data[2]; }
-        TML_MAYBE_UNUSED T& W() const noexcept { return Vector<4,T>::m_data[3]; }
+        TML_MAYBE_UNUSED const T& X() const noexcept { return Vector<4,T>::m_data[0]; }
+        TML_MAYBE_UNUSED const T& Y() const noexcept { return Vector<4,T>::m_data[1]; }
+        TML_MAYBE_UNUSED const T& Z() const noexcept { return Vector<4,T>::m_data[2]; }
+        TML_MAYBE_UNUSED const T& W() const noexcept { return Vector<4,T>::m_data[3]; }
 
         TML_MAYBE_UNUSED T& R() noexcept { return Vector<4,T>::m_data[0]; }
         TML_MAYBE_UNUSED T& G() noexcept { return Vector<4,T>::m_data[1]; }
         TML_MAYBE_UNUSED T& B() noexcept { return Vector<4,T>::m_data[2]; }
         TML_MAYBE_UNUSED T& A() noexcept { return Vector<4,T>::m_data[3]; }
 
-        TML_MAYBE_UNUSED T& R() const noexcept { return Vector<4,T>::m_data[0]; }
-        TML_MAYBE_UNUSED T& G() const noexcept { return Vector<4,T>::m_data[1]; }
-        TML_MAYBE_UNUSED T& B() const noexcept { return Vector<4,T>::m_data[2]; }
-        TML_MAYBE_UNUSED T& A() const noexcept { return Vector<4,T>::m_data[3]; }
+        TML_MAYBE_UNUSED const T& R() const noexcept { return Vector<4,T>::m_data[0]; }
+        TML_MAYBE_UNUSED const T& G() const noexcept { return Vector<4,T>::m_data[1]; }
+        TML_MAYBE_UNUSED const T& B() const noexcept { return Vector<4,T>::m_data[2]; }
+        TML_MAYBE_UNUSED const T& A() const noexcept { return Vector<4,T>::m_data[3]; }
     };
 
 #if defined(TML_PACK_STRUCT_DATA)
